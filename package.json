@@ -9,10 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.0.6",
     "@chakra-ui/react": "^2.2.6",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@faker-js/faker": "6.0.0",
+    "@fontsource/fira-sans": "^4.5.9",
     "date-fns": "^2.29.1",
     "framer-motion": "^6",
     "kalend": "^0.15.2",

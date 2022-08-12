@@ -9,9 +9,17 @@ const colors = {
     primary: '#1E1E49',
     secondary: '#C1C0D0',
   },
-  background: '#F9F9FA',
+  background: '#F4F5F5',
 };
 
-const theme = extendTheme({ colors });
+const fonts = {
+  heading: `'Fira Sans', sans-serif`,
+  body: `'Fira Sans', sans-serif`,
+};
+
+const theme = extendTheme({
+  fonts,
+  colors,
+});
 
 export default theme;

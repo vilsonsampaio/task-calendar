@@ -416,6 +416,13 @@
   dependencies:
     "@chakra-ui/utils" "2.0.6"
 
+"@chakra-ui/icons@^2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@chakra-ui/icons/-/icons-2.0.6.tgz#de60b0345d4a09037c275eb9e638e5ccf1496489"
+  integrity sha512-5NWrRhWvVSjGJIS4aJGJ6z2PVb/XDIpGMCqsS0aLhrVOkIHp1fv8hvXylTiR/nShRgZU9td/XyCBXJKHoE4BAA==
+  dependencies:
+    "@chakra-ui/icon" "3.0.6"
+
 "@chakra-ui/image@2.0.7":
   version "2.0.7"
   resolved "https://registry.yarnpkg.com/@chakra-ui/image/-/image-2.0.7.tgz#07a101d0fb604a0020abda77adefa3438cff9b15"
@@ -952,6 +959,11 @@
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-6.0.0.tgz#b613ebf5f5ebb2ab987afb567d8b7fe860199c13"
   integrity sha512-10zLCKhp3YEmBuko71ivcMoIZcCLXgQVck6aNswX+AWwaek/L8S3yz9i8m3tHigRkcF6F2vI+qtdtyySHK+bGA==
+
+"@fontsource/fira-sans@^4.5.9":
+  version "4.5.9"
+  resolved "https://registry.yarnpkg.com/@fontsource/fira-sans/-/fira-sans-4.5.9.tgz#b2e8e68c4ff566cc366504d87a75d33723f367d6"
+  integrity sha512-wGh4mUHjjWzMwJMCo3z4GOYe9a2QKgvg1bge0gIg8Je6LKNID+/EFmcXuUDyk1KbUKHpWJIquVM9kFFyJyRY2A==
 
 "@humanwhocodes/config-array@^0.10.4":
   version "0.10.4"

@@ -25,13 +25,9 @@ class TaskService {
           max: addDays(new Date(), 3).getTime(),
         }),
         duration: faker.random.arrayElement([
-          '00:15',
           '00:30',
-          '00:45',
           '01:00',
-          '01:15',
           '01:30',
-          '01:45',
           '02:00',
         ]),
       });
@@ -45,7 +41,7 @@ class TaskService {
   }
 
   async listTasks(): Promise<Task[]> {
-    await this.delay();
+    await this.delay(2000);
 
     return new Promise((resolve) => {
       resolve(this.tasks);
