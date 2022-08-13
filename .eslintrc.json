@@ -26,6 +26,15 @@
     "prettier"
   ],
   "rules": {
+    "prettier/prettier": ["error", {
+      "singleQuote": true,
+      "semi": true,
+      "arrowParams": "avoid",
+      "trailingComma": "es5",
+      "endOfLine": "auto"
+    }],
+    "react/prop-types": "off",
+    "react/require-default-props": "off",
     "camelcase": "off",
     "import/no-unresolved": "error",
     "@typescript-eslint/naming-convention": [
@@ -80,13 +89,13 @@
         ]
       }
     ],
-    "prettier/prettier": "error",
     "react/jsx-filename-extension": [1, { "extensions": [".jsx", ".tsx"] }],
     "react/react-in-jsx-scope": "off",
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": [
       "error"
-    ]
+    ],
+    "react/jsx-props-no-spreading": "off"
   },
   "settings": {
     "import/resolver": {

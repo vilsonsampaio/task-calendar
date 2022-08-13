@@ -4,10 +4,10 @@ import Kalend, { CalendarView, CalendarEvent } from 'kalend';
 import { useEffect, useState } from 'react';
 
 import Header from '../components/Header';
+import AddTaskModal from '../components/Modals/AddTaskModal';
 import TaskService, { Task } from '../services/TaskService';
 import theme from '../styles/theme';
 import convertTimeDurationInMinutes from '../utils/convertTimeDurationInMinutes';
-
 import 'kalend/dist/styles/index.css';
 
 type CalendarTask = CalendarEvent & Omit<Task, 'id'>;
@@ -15,6 +15,8 @@ type CalendarTask = CalendarEvent & Omit<Task, 'id'>;
 function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [tasks, setTasks] = useState<CalendarTask[]>([]);
+
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -59,43 +61,50 @@ function Home() {
   }
 
   return (
-    <Center width="100vw" height="100vh" bg="background">
-      <VStack
-        width="100%"
-        height="100%"
-        spacing={10}
-        maxW="992px"
-        marginX="auto"
-        paddingBottom={5}
-      >
-        <Header
-          onAddButtonClick={() => alert('Adicionar')}
-          onSearchButtonClick={() => alert('Pesquisar')}
-        />
+    <>
+      <AddTaskModal
+        isOpen={isAddTaskModalOpen}
+        onClose={() => setIsAddTaskModalOpen(false)}
+      />
 
-        <Flex flex="1" width="100%" bg="white" borderRadius={8} padding={5}>
-          <Kalend
-            colors={{
-              light: { primaryColor: theme.colors.brand },
-              dark: { primaryColor: theme.colors.brand },
-            }}
-            events={tasks}
-            onEventClick={(e) => alert(JSON.stringify(e))}
-            initialDate={new Date().toISOString()}
-            initialView={CalendarView.WEEK}
-            disabledViews={[CalendarView.THREE_DAYS, CalendarView.AGENDA]}
-            // selectedView={(e) => console.log(e)}
-            // onSelectView={(e) => console.log(e)}
-            // onPageChange={(e) => console.log(e)}
-            timeFormat="24"
-            weekDayStart="Sunday"
-            language="ptBR"
-            disabledDragging
-            hourHeight={60}
+      <Center width="100vw" height="100vh" bg="background">
+        <VStack
+          width="100%"
+          height="100%"
+          spacing={10}
+          maxW="992px"
+          marginX="auto"
+          paddingBottom={5}
+        >
+          <Header
+            onAddButtonClick={() => setIsAddTaskModalOpen(true)}
+            onSearchButtonClick={() => alert('Pesquisar')}
           />
-        </Flex>
-      </VStack>
-    </Center>
+
+          <Flex flex="1" width="100%" bg="white" borderRadius={8} padding={5}>
+            <Kalend
+              colors={{
+                light: { primaryColor: theme.colors.brand },
+                dark: { primaryColor: theme.colors.brand },
+              }}
+              events={tasks}
+              onEventClick={(e) => alert(JSON.stringify(e))}
+              initialDate={new Date().toISOString()}
+              initialView={CalendarView.WEEK}
+              disabledViews={[CalendarView.THREE_DAYS, CalendarView.AGENDA]}
+              // selectedView={(e) => console.log(e)}
+              // onSelectView={(e) => console.log(e)}
+              // onPageChange={(e) => console.log(e)}
+              timeFormat="24"
+              weekDayStart="Sunday"
+              language="ptBR"
+              disabledDragging
+              hourHeight={60}
+            />
+          </Flex>
+        </VStack>
+      </Center>
+    </>
   );
 }
 
