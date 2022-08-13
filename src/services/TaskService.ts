@@ -85,6 +85,20 @@ class TaskService {
       resolve(updatedTask);
     });
   }
+
+  async deleteTask(id: string): Promise<Task> {
+    await this.delay(2000);
+
+    return new Promise((resolve) => {
+      const deletedTask = this.tasks.find((task) => task.id === id);
+
+      if (!deletedTask) throw new Error("Task doesn't exists");
+
+      this.tasks = this.tasks.filter((task) => task.id !== deletedTask.id);
+
+      resolve(deletedTask);
+    });
+  }
 }
 
 export default new TaskService();

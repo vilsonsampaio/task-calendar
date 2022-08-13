@@ -47,6 +47,9 @@ function Home() {
   const isEditing = selectedTask !== null;
   const [isTaskFormModalOpen, setIsTaskFormModalOpen] = useState(false);
   const [isTaskDetailModalOpen, setIsTaskDetailModalOpen] = useState(false);
+  const [isTaskDeleteModalOpen, setIsTaskDeleteModalOpen] = useState(false);
+
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -82,7 +85,7 @@ function Home() {
     })();
   }, []);
 
-  function handleOpenTaskForm() {
+  function handleOpenTaskFormModal() {
     setIsTaskDetailModalOpen(false);
     setIsTaskFormModalOpen(true);
   }
@@ -200,6 +203,33 @@ function Home() {
     setIsTaskDetailModalOpen(false);
   }
 
+  function handleOpenTaskDeleteModal() {
+    setIsTaskDetailModalOpen(false);
+    setIsTaskDeleteModalOpen(true);
+  }
+
+  function handleCloseTaskDeleteModal() {
+    setSelectedTask(null);
+    setIsTaskDeleteModalOpen(false);
+  }
+
+  async function handleDeleteTask() {
+    try {
+      if (!selectedTask) throw new Error('You need to select some task');
+
+      setIsDeleting(true);
+
+      const deletedTask = await TaskService.deleteTask(selectedTask.id);
+
+      setTasks((tasks) => tasks.filter((task) => task.id !== deletedTask.id));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsDeleting(false);
+      handleCloseTaskDeleteModal();
+    }
+  }
+
   if (isLoading) {
     return (
       <Center width="100vw" height="100vh" bg="background">
@@ -210,6 +240,57 @@ function Home() {
 
   return (
     <>
+      {selectedTask !== null && (
+        <Modal
+          isOpen={isTaskDetailModalOpen}
+          onClose={() => handleCloseTaskDetailModal()}
+          title={selectedTask.title}
+          size="sm"
+        >
+          <ModalBody pb={6}>
+            <HStack
+              alignItems="flex-end"
+              color="text.secondary"
+              borderBottomStyle="solid"
+              borderBottomWidth="1px"
+              borderBottomColor="border"
+              pb={5}
+            >
+              <CalendarIcon />
+
+              <Text fontSize={14} lineHeight="1">
+                {renderTaskDate(selectedTask.date, selectedTask.duration)}
+              </Text>
+            </HStack>
+
+            <Text color="text.primary" mt={6}>
+              {selectedTask.description}
+            </Text>
+          </ModalBody>
+
+          <ModalFooter gap={3}>
+            <Button
+              variant="solid"
+              leftIcon={<EditIcon />}
+              flex="1"
+              onClick={() => handleOpenTaskFormModal()}
+            >
+              Editar
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => handleOpenTaskDeleteModal()}
+              leftIcon={<DeleteIcon />}
+              flex="1"
+              colorScheme="red"
+            >
+              Remover
+            </Button>
+          </ModalFooter>
+        </Modal>
+      )}
+
       <Modal
         isOpen={isTaskFormModalOpen}
         onClose={() => handleCloseTaskFormModal()}
@@ -279,50 +360,33 @@ function Home() {
 
       {selectedTask !== null && (
         <Modal
-          isOpen={isTaskDetailModalOpen}
-          onClose={() => handleCloseTaskDetailModal()}
-          title={selectedTask.title}
+          isOpen={isTaskDeleteModalOpen}
+          onClose={() => handleCloseTaskDeleteModal()}
+          title="Atenção"
           size="sm"
         >
           <ModalBody pb={6}>
-            <HStack
-              alignItems="flex-end"
-              color="text.secondary"
-              borderBottomStyle="solid"
-              borderBottomWidth="1px"
-              borderBottomColor="border"
-              pb={5}
-            >
-              <CalendarIcon />
-
-              <Text fontSize={14} lineHeight="1">
-                {renderTaskDate(selectedTask.date, selectedTask.duration)}
-              </Text>
-            </HStack>
-
             <Text color="text.primary" mt={6}>
-              {selectedTask.description}
+              Deseja realmente remover a tarefa selecionada? Após concluída,
+              esta ação não poderá ser desfeita.
             </Text>
           </ModalBody>
 
           <ModalFooter gap={3}>
             <Button
               variant="solid"
-              leftIcon={<EditIcon />}
-              flex="1"
-              onClick={() => handleOpenTaskForm()}
+              colorScheme="red"
+              isLoading={isDeleting}
+              onClick={() => handleDeleteTask()}
             >
-              Editar
+              Remover
             </Button>
 
             <Button
               variant="outline"
-              onClick={() => setIsTaskDetailModalOpen(false)}
-              leftIcon={<DeleteIcon />}
-              flex="1"
-              colorScheme="red"
+              onClick={() => handleCloseTaskDeleteModal()}
             >
-              Remover
+              Cancelar
             </Button>
           </ModalFooter>
         </Modal>
