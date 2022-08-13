@@ -1,13 +1,18 @@
+/* eslint-disable import/no-duplicates */
+import { CalendarIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import {
   Center,
   Flex,
   Grid,
+  HStack,
   ModalBody,
   ModalFooter,
   Spinner,
+  Text,
   VStack,
 } from '@chakra-ui/react';
-import { addMinutes, parseISO } from 'date-fns';
+import { addMinutes, format, isSameDay, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { useFormik } from 'formik';
 import Kalend, { CalendarView, CalendarEvent } from 'kalend';
 import { useEffect, useState } from 'react';
@@ -16,8 +21,7 @@ import * as Yup from 'yup';
 import Button from '../components/Button';
 import Header from '../components/Header';
 import Input from '../components/Input';
-import Modal from '../components/Modals/Modal';
-import TaskDetailModal from '../components/Modals/TaskDetailModal';
+import Modal from '../components/Modal';
 import Textarea from '../components/Textarea';
 import TaskService, { Task } from '../services/TaskService';
 import theme from '../styles/theme';
@@ -126,6 +130,25 @@ function Home() {
     })();
   }, []);
 
+  function renderTaskDate(date: Date, duration: string) {
+    const formattedStartDate = format(date, 'EEEEEE, dd MMM - HH:mm', {
+      locale: ptBR,
+    });
+
+    let formattedEndDate;
+
+    const endDate = addMinutes(date, convertTimeDurationInMinutes(duration));
+    if (isSameDay(date, endDate)) {
+      formattedEndDate = format(endDate, 'HH:mm', { locale: ptBR });
+    } else {
+      formattedEndDate = format(endDate, 'EEEEEE, dd MMM - HH:mm', {
+        locale: ptBR,
+      });
+    }
+
+    return `${formattedStartDate} - ${formattedEndDate}`;
+  }
+
   if (isLoading) {
     return (
       <Center width="100vw" height="100vh" bg="background">
@@ -203,11 +226,54 @@ function Home() {
       </Modal>
 
       {selectedTask !== null && (
-        <TaskDetailModal
-          task={selectedTask}
+        <Modal
           isOpen={isTaskDetailModalOpen}
           onClose={() => setIsTaskDetailModalOpen(false)}
-        />
+          title={selectedTask.title}
+          size="sm"
+        >
+          <ModalBody pb={6}>
+            <HStack
+              alignItems="flex-end"
+              color="text.secondary"
+              borderBottomStyle="solid"
+              borderBottomWidth="1px"
+              borderBottomColor="border"
+              pb={5}
+            >
+              <CalendarIcon />
+
+              <Text fontSize={14} lineHeight="1">
+                {renderTaskDate(selectedTask.date, selectedTask.duration)}
+              </Text>
+            </HStack>
+
+            <Text color="text.primary" mt={6}>
+              {selectedTask.description}
+            </Text>
+          </ModalBody>
+
+          <ModalFooter gap={3}>
+            <Button
+              type="submit"
+              variant="solid"
+              leftIcon={<EditIcon />}
+              flex="1"
+            >
+              Editar
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => setIsTaskDetailModalOpen(false)}
+              leftIcon={<DeleteIcon />}
+              flex="1"
+              colorScheme="red"
+            >
+              Remover
+            </Button>
+          </ModalFooter>
+        </Modal>
       )}
 
       <Center width="100vw" height="100vh" bg="background">
