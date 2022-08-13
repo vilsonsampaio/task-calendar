@@ -2,13 +2,13 @@
 import {
   FormControl,
   FormLabel,
-  Input as ChackraInput,
+  Input as ChakraInput,
   FormErrorMessage,
-  InputProps as ChackraInputProps,
+  InputProps as ChakraInputProps,
 } from '@chakra-ui/react';
 import React, { forwardRef } from 'react';
 
-interface InputProps extends ChackraInputProps {
+interface InputProps extends ChakraInputProps {
   label: string;
   name: string;
   error?: string;
@@ -24,7 +24,7 @@ const Input: React.ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
         {label}
       </FormLabel>
 
-      <ChackraInput
+      <ChakraInput
         {...rest}
         id={name}
         ref={ref}

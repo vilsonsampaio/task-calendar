@@ -65,6 +65,26 @@ class TaskService {
       resolve(newTask);
     });
   }
+
+  async updateTask(id: string, body: Omit<Task, 'id'>): Promise<Task> {
+    await this.delay(2000);
+
+    return new Promise((resolve) => {
+      const updatedTask: Task = {
+        id,
+        title: body.title,
+        description: body.description,
+        date: body.date,
+        duration: body.duration,
+      };
+
+      this.tasks = this.tasks.map((task) =>
+        task.id === id ? updatedTask : task
+      );
+
+      resolve(updatedTask);
+    });
+  }
 }
 
 export default new TaskService();
