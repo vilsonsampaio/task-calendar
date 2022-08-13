@@ -47,6 +47,24 @@ class TaskService {
       resolve(this.tasks);
     });
   }
+
+  async createTask(body: Omit<Task, 'id'>): Promise<Task> {
+    await this.delay(2000);
+
+    return new Promise((resolve) => {
+      const newTask: Task = {
+        id: faker.datatype.uuid(),
+        title: body.title,
+        description: body.description,
+        date: body.date,
+        duration: body.duration,
+      };
+
+      this.tasks.push(newTask);
+
+      resolve(newTask);
+    });
+  }
 }
 
 export default new TaskService();
