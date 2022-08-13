@@ -5,18 +5,22 @@ import { useEffect, useState } from 'react';
 
 import Header from '../components/Header';
 import AddTaskModal from '../components/Modals/AddTaskModal';
+import TaskDetailModal from '../components/Modals/TaskDetailModal';
 import TaskService, { Task } from '../services/TaskService';
 import theme from '../styles/theme';
 import convertTimeDurationInMinutes from '../utils/convertTimeDurationInMinutes';
 import 'kalend/dist/styles/index.css';
 
-type CalendarTask = CalendarEvent & Omit<Task, 'id'>;
+export type CalendarTask = CalendarEvent & Omit<Task, 'id'>;
 
 function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [tasks, setTasks] = useState<CalendarTask[]>([]);
 
+  const [selectedTask, setSelectedTask] = useState<CalendarTask | null>(null);
+
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [isTaskDetailModalOpen, setIsTaskDetailModalOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -67,6 +71,14 @@ function Home() {
         onClose={() => setIsAddTaskModalOpen(false)}
       />
 
+      {selectedTask !== null && (
+        <TaskDetailModal
+          task={selectedTask}
+          isOpen={isTaskDetailModalOpen}
+          onClose={() => setIsTaskDetailModalOpen(false)}
+        />
+      )}
+
       <Center width="100vw" height="100vh" bg="background">
         <VStack
           width="100%"
@@ -88,7 +100,10 @@ function Home() {
                 dark: { primaryColor: theme.colors.brand },
               }}
               events={tasks}
-              onEventClick={(e) => alert(JSON.stringify(e))}
+              onEventClick={(event) => {
+                setSelectedTask(event as CalendarTask);
+                setIsTaskDetailModalOpen(true);
+              }}
               initialDate={new Date().toISOString()}
               initialView={CalendarView.WEEK}
               disabledViews={[CalendarView.THREE_DAYS, CalendarView.AGENDA]}

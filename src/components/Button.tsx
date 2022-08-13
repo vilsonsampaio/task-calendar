@@ -12,7 +12,7 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, ButtonProps> = (
   ref
 ) => {
   return (
-    <ChakraButton {...rest} ref={ref} colorScheme="purple">
+    <ChakraButton ref={ref} colorScheme="purple" {...rest}>
       {children}
     </ChakraButton>
   );

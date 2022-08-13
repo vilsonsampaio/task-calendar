@@ -1,6 +1,6 @@
 import {
-  Modal as ChackraModal,
-  ModalProps as ChackraModalProps,
+  Modal as ChakraModal,
+  ModalProps as ChakraModalProps,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
@@ -8,23 +8,26 @@ import {
 } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 
-export interface ModalProps extends ChackraModalProps {
+export interface ModalProps extends ChakraModalProps {
   title: string;
   children: ReactNode;
 }
 
 function Modal({ title, children, ...rest }: ModalProps) {
   return (
-    <ChackraModal {...rest} isCentered>
+    <ChakraModal {...rest} isCentered>
       <ModalOverlay />
 
       <ModalContent>
-        <ModalHeader>{title}</ModalHeader>
-        <ModalCloseButton />
+        <ModalHeader color="black" pr={9}>
+          <strong>{title}</strong>
+
+          <ModalCloseButton />
+        </ModalHeader>
 
         {children}
       </ModalContent>
-    </ChackraModal>
+    </ChakraModal>
   );
 }
 
