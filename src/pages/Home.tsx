@@ -1,10 +1,18 @@
 /* eslint-disable import/no-duplicates */
-import { CalendarIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import {
+  CalendarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DeleteIcon,
+  EditIcon,
+} from '@chakra-ui/icons';
+import {
+  ButtonGroup,
   Center,
   Flex,
   Grid,
   HStack,
+  IconButton,
   ModalBody,
   ModalFooter,
   Spinner,
@@ -16,7 +24,7 @@ import { addMinutes, format, isSameDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useFormik } from 'formik';
 import Kalend, { CalendarView, CalendarEvent, CALENDAR_VIEW } from 'kalend';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Yup from 'yup';
 
 import Button from '../components/Button';
@@ -42,10 +50,16 @@ interface TaskFormik {
 function Home() {
   const toast = useToast();
 
+  const kalendRef: any = useRef();
+
   const [isLoading, setIsLoading] = useState(true);
   const [tasks, setTasks] = useState<CalendarTask[]>([]);
 
   const [search, setSearch] = useState('');
+  const [selectedView, setSelectedView] = useState<CALENDAR_VIEW>(
+    CalendarView.WEEK
+  );
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const filteredTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(search.toLowerCase())
@@ -98,6 +112,22 @@ function Home() {
       }
     })();
   }, []);
+
+  function handleCalendarStateChange(state: any) {
+    setSelectedDate(parseISO(state.selectedDate));
+  }
+
+  function handleCalendarGoForward() {
+    kalendRef?.current?.navigateForward();
+  }
+
+  function handleCalendarGoBack() {
+    kalendRef?.current?.navigateBackwards();
+  }
+
+  function handleCalendarGoToday() {
+    kalendRef?.current?.navigateToTodayDate();
+  }
 
   function handleOpenTaskFormModal() {
     setIsTaskDetailModalOpen(false);
@@ -426,7 +456,7 @@ function Home() {
         </Modal>
       )}
 
-      <Center width="100vw" height="100vh" bg="background">
+      <Center width="100vw" height="100vh" bg="background" overflowX="hidden">
         <VStack
           width="100%"
           height="100%"
@@ -436,12 +466,151 @@ function Home() {
           paddingBottom={5}
         >
           <Header
-            onSearch={(value) => setSearch(value)}
+            onSearch={(value) => {
+              setSearch(value);
+              setSelectedView(
+                value !== '' ? CalendarView.AGENDA : CalendarView.WEEK
+              );
+            }}
             onAddButtonClick={() => setIsTaskFormModalOpen(true)}
           />
 
-          <Flex flex="1" width="100%" bg="white" borderRadius={8} padding={5}>
+          <VStack
+            flex="1"
+            width="100%"
+            bg="white"
+            borderRadius={8}
+            padding={5}
+            sx={{
+              '.Kalend__main': {
+                borderRadius: 8,
+              },
+
+              '.Kalend__main *': {
+                fontFamily: 'body',
+              },
+
+              '.Kalend__CalendarHeader, .Kalend__CalendarHeader-dark, .Kalend__CalendarHeader-tall, .Kalend__CalendarHeader-tall-dark, .Kalend__CalendarHeader-small, .Kalend__CalendarHeader-day, .Kalend__CalendarHeader-tall-day':
+                {
+                  boxShadow: 'none',
+                  backgroundColor: 'border',
+                  borderRadius: 0,
+
+                  height: 24,
+
+                  justifyContent: 'center',
+                },
+
+              '.Kalend__CalendarHeaderCol': {
+                paddingBottom: 0,
+              },
+
+              '.Kalend__CalendarHeaderColText__container': {
+                height: 6,
+              },
+
+              '.Kalend__Event-normal, .Kalend__Event-normal-dark': {
+                backgroundColor: 'brand !important',
+                color: 'color !important',
+                padding: 2,
+              },
+
+              '.Kalend__Event__summary': {
+                padding: 0,
+                fontWeight: 600,
+              },
+            }}
+          >
+            <Flex
+              w="100%"
+              alignItems="center"
+              justifyContent="space-between"
+              mb={8}
+            >
+              <HStack spacing={4}>
+                <IconButton
+                  aria-label="Voltar"
+                  variant="ghost"
+                  icon={<ChevronLeftIcon w={6} h={6} color="gray" />}
+                  onClick={handleCalendarGoBack}
+                />
+
+                <Text
+                  color="text.primary"
+                  fontWeight={600}
+                  fontSize={18}
+                  textTransform="capitalize"
+                >
+                  {format(selectedDate, 'LLLL yyyy', { locale: ptBR })}
+                </Text>
+
+                <IconButton
+                  aria-label="Próximo"
+                  variant="ghost"
+                  icon={<ChevronRightIcon w={6} h={6} color="gray" />}
+                  onClick={handleCalendarGoForward}
+                />
+              </HStack>
+
+              <HStack spacing={16}>
+                <Button
+                  variant="ghost"
+                  fontWeight={600}
+                  color="gray"
+                  onClick={handleCalendarGoToday}
+                  fontSize={15}
+                >
+                  Hoje
+                </Button>
+
+                <ButtonGroup
+                  spacing={0}
+                  bg="border"
+                  borderRadius="0.375rem"
+                  fontWeight={500}
+                  size="sm"
+                  py={1.5}
+                  px={3}
+                >
+                  <Button
+                    variant={
+                      selectedView === CalendarView.DAY ? 'solid' : 'ghost'
+                    }
+                    onClick={() => setSelectedView(CalendarView.DAY)}
+                    fontWeight={500}
+                    px={5}
+                  >
+                    Dia
+                  </Button>
+
+                  <Button
+                    variant={
+                      selectedView === CalendarView.WEEK ? 'solid' : 'ghost'
+                    }
+                    onClick={() => setSelectedView(CalendarView.WEEK)}
+                    borderRadius="0.375rem"
+                    fontWeight={500}
+                    px={5}
+                  >
+                    Semana
+                  </Button>
+
+                  <Button
+                    variant={
+                      selectedView === CalendarView.MONTH ? 'solid' : 'ghost'
+                    }
+                    onClick={() => setSelectedView(CalendarView.MONTH)}
+                    fontWeight={500}
+                    px={5}
+                  >
+                    Mês
+                  </Button>
+                </ButtonGroup>
+              </HStack>
+            </Flex>
+
             <Kalend
+              kalendRef={kalendRef}
               colors={{
                 light: { primaryColor: theme.colors.brand },
                 dark: { primaryColor: theme.colors.brand },
@@ -452,15 +621,16 @@ function Home() {
                 setIsTaskDetailModalOpen(true);
               }}
               initialDate={new Date().toISOString()}
-              initialView={CalendarView.WEEK}
               disabledViews={[CalendarView.THREE_DAYS, CalendarView.AGENDA]}
+              selectedView={selectedView}
+              onStateChange={handleCalendarStateChange}
               timeFormat="24"
               weekDayStart="Sunday"
               language="ptBR"
               disabledDragging
               hourHeight={60}
             />
-          </Flex>
+          </VStack>
         </VStack>
       </Center>
     </>

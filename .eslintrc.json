@@ -95,7 +95,9 @@
     "@typescript-eslint/no-use-before-define": [
       "error"
     ],
-    "react/jsx-props-no-spreading": "off"
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-no-bind": "off",
+    "no-nested-ternary": "off"
   },
   "settings": {
     "import/resolver": {
