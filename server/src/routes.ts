@@ -6,5 +6,6 @@ const router = Router();
 const createTask = new TaskController();
 
 router.post('/task', createTask.create);
+router.get('/task', createTask.index);
 
 export { router };
