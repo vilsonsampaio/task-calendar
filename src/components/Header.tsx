@@ -1,12 +1,32 @@
 import { AddIcon, CalendarIcon, Search2Icon } from '@chakra-ui/icons';
-import { Center, Flex, Heading, HStack, IconButton } from '@chakra-ui/react';
+import {
+  Center,
+  Flex,
+  Heading,
+  HStack,
+  IconButton,
+  Input,
+  InputGroup,
+  InputLeftElement,
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+
+import useDebounce from '../hooks/useDebounce';
 
 interface HeaderProps {
-  onSearchButtonClick: () => unknown;
+  onSearch: (search: string) => unknown;
   onAddButtonClick: () => unknown;
 }
 
-function Header({ onAddButtonClick, onSearchButtonClick }: HeaderProps) {
+function Header({ onAddButtonClick, onSearch }: HeaderProps) {
+  const [search, setSearch] = useState('');
+
+  const debouncedSearch = useDebounce(search);
+
+  useEffect(() => {
+    onSearch(debouncedSearch);
+  }, [debouncedSearch]);
+
   return (
     <Flex
       as="header"
@@ -26,13 +46,21 @@ function Header({ onAddButtonClick, onSearchButtonClick }: HeaderProps) {
       </HStack>
 
       <HStack spacing={4}>
-        <IconButton
-          aria-label="Pesquisar tarefa"
-          icon={<Search2Icon />}
-          variant="outline"
-          colorScheme="purple"
-          onClick={onSearchButtonClick}
-        />
+        <InputGroup>
+          <InputLeftElement pointerEvents="none">
+            <Search2Icon color="brand" />
+          </InputLeftElement>
+
+          <Input
+            placeholder="Pesquisar tarefa..."
+            color="gray.600"
+            boxShadow="sm"
+            borderColor="gray.300"
+            focusBorderColor="brand"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </InputGroup>
 
         <IconButton
           aria-label="Adicionar tarefa"

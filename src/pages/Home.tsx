@@ -9,12 +9,13 @@ import {
   ModalFooter,
   Spinner,
   Text,
+  useToast,
   VStack,
 } from '@chakra-ui/react';
 import { addMinutes, format, isSameDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useFormik } from 'formik';
-import Kalend, { CalendarView, CalendarEvent } from 'kalend';
+import Kalend, { CalendarView, CalendarEvent, CALENDAR_VIEW } from 'kalend';
 import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 
@@ -39,8 +40,16 @@ interface TaskFormik {
 }
 
 function Home() {
+  const toast = useToast();
+
   const [isLoading, setIsLoading] = useState(true);
   const [tasks, setTasks] = useState<CalendarTask[]>([]);
+
+  const [search, setSearch] = useState('');
+
+  const filteredTasks = tasks.filter((task) =>
+    task.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   const [selectedTask, setSelectedTask] = useState<CalendarTask | null>(null);
 
@@ -79,6 +88,11 @@ function Home() {
         setTasks(parsedTasks);
       } catch (error) {
         console.error(error);
+
+        toast({
+          title: 'Não foi possível listar as tarefas!',
+          status: 'error',
+        });
       } finally {
         setIsLoading(false);
       }
@@ -145,6 +159,11 @@ function Home() {
             task.id === parsedTask.id ? parsedTask : task
           )
         );
+
+        toast({
+          title: 'Tarefa editada com sucesso!',
+          status: 'success',
+        });
       } else {
         const newTask = await TaskService.createTask({
           title: values.title,
@@ -172,6 +191,10 @@ function Home() {
         };
 
         setTasks((prevState) => [...prevState, parsedTask]);
+        toast({
+          title: 'Tarefa criada com sucesso!',
+          status: 'success',
+        });
       }
 
       resetForm();
@@ -222,8 +245,17 @@ function Home() {
       const deletedTask = await TaskService.deleteTask(selectedTask.id);
 
       setTasks((tasks) => tasks.filter((task) => task.id !== deletedTask.id));
+      toast({
+        title: 'Tarefa removida com sucesso!',
+        status: 'success',
+      });
     } catch (error) {
       console.error(error);
+
+      toast({
+        title: 'Não foi possível remover a tarefa!',
+        status: 'error',
+      });
     } finally {
       setIsDeleting(false);
       handleCloseTaskDeleteModal();
@@ -344,6 +376,7 @@ function Home() {
               type="submit"
               variant="solid"
               isLoading={taskFormik.isSubmitting}
+              loadingText={isEditing ? 'Editando...' : 'Adicionando...'}
             >
               {isEditing ? 'Editar' : 'Adicionar'}
             </Button>
@@ -376,8 +409,9 @@ function Home() {
             <Button
               variant="solid"
               colorScheme="red"
-              isLoading={isDeleting}
               onClick={() => handleDeleteTask()}
+              isLoading={isDeleting}
+              loadingText="Removendo..."
             >
               Remover
             </Button>
@@ -402,8 +436,8 @@ function Home() {
           paddingBottom={5}
         >
           <Header
+            onSearch={(value) => setSearch(value)}
             onAddButtonClick={() => setIsTaskFormModalOpen(true)}
-            onSearchButtonClick={() => alert('Pesquisar')}
           />
 
           <Flex flex="1" width="100%" bg="white" borderRadius={8} padding={5}>
@@ -412,7 +446,7 @@ function Home() {
                 light: { primaryColor: theme.colors.brand },
                 dark: { primaryColor: theme.colors.brand },
               }}
-              events={tasks}
+              events={filteredTasks}
               onEventClick={(event) => {
                 setSelectedTask(event as CalendarTask);
                 setIsTaskDetailModalOpen(true);
@@ -420,9 +454,6 @@ function Home() {
               initialDate={new Date().toISOString()}
               initialView={CalendarView.WEEK}
               disabledViews={[CalendarView.THREE_DAYS, CalendarView.AGENDA]}
-              // selectedView={(e) => console.log(e)}
-              // onSelectView={(e) => console.log(e)}
-              // onPageChange={(e) => console.log(e)}
               timeFormat="24"
               weekDayStart="Sunday"
               language="ptBR"
