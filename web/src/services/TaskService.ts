@@ -1,103 +1,35 @@
-import faker from '@faker-js/faker';
-import { addDays, subDays } from 'date-fns';
+import HttpClient from './utils/HttpClient';
 
-export interface Task {
+interface Task {
   id: string;
   title: string;
-  description?: string;
+  description: string;
+  date: string;
+  duration: number;
+}
+
+interface TaskRequest {
+  title: string;
+  description: string;
   date: Date;
   duration: string;
 }
 
 class TaskService {
-  private tasks: Task[];
-
-  constructor() {
-    this.tasks = [];
-
-    for (let i = 0; i < 20; i += 1) {
-      this.tasks.push({
-        id: faker.datatype.uuid(),
-        title: faker.lorem.words(6),
-        description: faker.lorem.words(20),
-        date: faker.datatype.datetime({
-          min: subDays(new Date(), 3).getTime(),
-          max: addDays(new Date(), 3).getTime(),
-        }),
-        duration: faker.random.arrayElement([
-          '00:30',
-          '01:00',
-          '01:30',
-          '02:00',
-        ]),
-      });
-    }
+  async listTasks() {
+    return HttpClient.get<Task[]>('/task');
   }
 
-  private async delay(time?: number): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(resolve, time || 500);
-    });
+  async createTask(body: TaskRequest) {
+    return HttpClient.post<Task>('/task', body);
   }
 
-  async listTasks(): Promise<Task[]> {
-    await this.delay(2000);
-
-    return new Promise((resolve) => {
-      resolve(this.tasks);
-    });
+  async updateTask(id: string, body: TaskRequest) {
+    return HttpClient.put<Task>(`/task/${id}`, body);
   }
 
-  async createTask(body: Omit<Task, 'id'>): Promise<Task> {
-    await this.delay(2000);
-
-    return new Promise((resolve) => {
-      const newTask: Task = {
-        id: faker.datatype.uuid(),
-        title: body.title,
-        description: body.description,
-        date: body.date,
-        duration: body.duration,
-      };
-
-      this.tasks.push(newTask);
-
-      resolve(newTask);
-    });
-  }
-
-  async updateTask(id: string, body: Omit<Task, 'id'>): Promise<Task> {
-    await this.delay(2000);
-
-    return new Promise((resolve) => {
-      const updatedTask: Task = {
-        id,
-        title: body.title,
-        description: body.description,
-        date: body.date,
-        duration: body.duration,
-      };
-
-      this.tasks = this.tasks.map((task) =>
-        task.id === id ? updatedTask : task
-      );
-
-      resolve(updatedTask);
-    });
-  }
-
-  async deleteTask(id: string): Promise<Task> {
-    await this.delay(2000);
-
-    return new Promise((resolve) => {
-      const deletedTask = this.tasks.find((task) => task.id === id);
-
-      if (!deletedTask) throw new Error("Task doesn't exists");
-
-      this.tasks = this.tasks.filter((task) => task.id !== deletedTask.id);
-
-      resolve(deletedTask);
-    });
+  async deleteTask(id: string) {
+    return HttpClient.delete<Task>(`/task/${id}`);
   }
 }
 
