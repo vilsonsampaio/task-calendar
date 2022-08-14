@@ -68,4 +68,23 @@ export class TaskController {
 
     return response.json(task);
   }
+
+  async destroy(request: Request, response: Response) {
+    const { id } = request.params;
+
+    const task = await prismaClient.task.delete({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        date: true,
+        duration: true,
+      }
+    });
+
+    return response.json(task);
+  }
 }
