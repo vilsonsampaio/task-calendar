@@ -33,9 +33,39 @@ export class TaskController {
         description: true,
         date: true,
         duration: true,
-      }
+      },
+      orderBy: {
+        created_at: 'asc',
+      },
+      
     });
 
     return response.json(tasks);
+  }
+
+  async update(request: Request, response: Response) {
+    const { id } = request.params;
+    const { title, description, date, duration } = request.body;
+
+    const task = await prismaClient.task.update({
+      where: {
+        id: id,
+      },
+      data: {
+        title,
+        description,
+        date,
+        duration: convertDurationToMinutes(duration),
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        date: true,
+        duration: true,
+      }
+    });
+
+    return response.json(task);
   }
 }
