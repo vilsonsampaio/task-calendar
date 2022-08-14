@@ -305,7 +305,7 @@ function Home() {
       {selectedTask !== null && (
         <Modal
           isOpen={isTaskDetailModalOpen}
-          onClose={() => handleCloseTaskDetailModal()}
+          onClose={handleCloseTaskDetailModal}
           title={selectedTask.title}
           size="sm"
         >
@@ -335,14 +335,14 @@ function Home() {
               variant="solid"
               leftIcon={<EditIcon />}
               flex="1"
-              onClick={() => handleOpenTaskFormModal()}
+              onClick={handleOpenTaskFormModal}
             >
               Editar
             </Button>
 
             <Button
               variant="outline"
-              onClick={() => handleOpenTaskDeleteModal()}
+              onClick={handleOpenTaskDeleteModal}
               leftIcon={<DeleteIcon />}
               flex="1"
               colorScheme="red"
@@ -355,7 +355,7 @@ function Home() {
 
       <Modal
         isOpen={isTaskFormModalOpen}
-        onClose={() => handleCloseTaskFormModal()}
+        onClose={handleCloseTaskFormModal}
         title={isEditing ? 'Editar tarefa' : 'Adicionar tarefa'}
       >
         <form onSubmit={taskFormik.handleSubmit}>
@@ -411,10 +411,7 @@ function Home() {
               {isEditing ? 'Editar' : 'Adicionar'}
             </Button>
 
-            <Button
-              variant="outline"
-              onClick={() => handleCloseTaskFormModal()}
-            >
+            <Button variant="outline" onClick={handleCloseTaskFormModal}>
               Cancelar
             </Button>
           </ModalFooter>
@@ -424,7 +421,7 @@ function Home() {
       {selectedTask !== null && (
         <Modal
           isOpen={isTaskDeleteModalOpen}
-          onClose={() => handleCloseTaskDeleteModal()}
+          onClose={handleCloseTaskDeleteModal}
           title="Atenção"
           size="sm"
         >
@@ -439,17 +436,14 @@ function Home() {
             <Button
               variant="solid"
               colorScheme="red"
-              onClick={() => handleDeleteTask()}
+              onClick={handleDeleteTask}
               isLoading={isDeleting}
               loadingText="Removendo..."
             >
               Remover
             </Button>
 
-            <Button
-              variant="outline"
-              onClick={() => handleCloseTaskDeleteModal()}
-            >
+            <Button variant="outline" onClick={handleCloseTaskDeleteModal}>
               Cancelar
             </Button>
           </ModalFooter>
@@ -461,7 +455,8 @@ function Home() {
           width="100%"
           height="100%"
           spacing={10}
-          maxW="992px"
+          maxW="860px"
+          maxH="768px"
           marginX="auto"
           paddingBottom={5}
         >
@@ -500,6 +495,10 @@ function Home() {
 
                   justifyContent: 'center',
                 },
+
+              '.Kalend__CalendarHeader-small': {
+                height: 10,
+              },
 
               '.Kalend__CalendarHeaderCol': {
                 paddingBottom: 0,
