@@ -32,13 +32,19 @@ import Header from '../components/Header';
 import Input from '../components/Input';
 import Modal from '../components/Modal';
 import Textarea from '../components/Textarea';
-import TaskService, { Task } from '../services/TaskService';
+import TaskService from '../services/TaskService';
 import theme from '../styles/theme';
+import convertMinutesInTimeDuration from '../utils/convertMinutesInTimeDuration';
 import convertTimeDurationInMinutes from '../utils/convertTimeDurationInMinutes';
 
 import 'kalend/dist/styles/index.css';
 
-export type CalendarTask = CalendarEvent & Omit<Task, 'id'>;
+export interface CalendarTask extends CalendarEvent {
+  title: string;
+  description: string;
+  date: Date;
+  duration: string;
+}
 
 interface TaskFormik {
   title: string;
@@ -79,24 +85,21 @@ function Home() {
       try {
         setIsLoading(true);
 
-        const tasksData = await TaskService.listTasks();
+        const { data } = await TaskService.listTasks();
 
-        const parsedTasks: CalendarTask[] = tasksData.map((task) => ({
+        const parsedTasks: CalendarTask[] = data.map((task) => ({
           id: task.id,
-          startAt: task.date.toISOString(),
-          endAt: addMinutes(
-            task.date,
-            convertTimeDurationInMinutes(task.duration)
-          ).toISOString(),
+          startAt: parseISO(task.date).toISOString(),
+          endAt: addMinutes(parseISO(task.date), task.duration).toISOString(),
           timezoneStartAt: 'America/Fortaleza',
           timezoneEndAt: 'America/Fortaleza',
           summary: task.title,
           color: theme.colors.brand,
 
           title: task.title,
-          date: task.date,
+          date: parseISO(task.date),
           description: task.description,
-          duration: task.duration,
+          duration: convertMinutesInTimeDuration(task.duration),
         }));
 
         setTasks(parsedTasks);
@@ -159,19 +162,22 @@ function Home() {
     }),
     onSubmit: async (values, { resetForm }) => {
       if (isEditing) {
-        const updatedTask = await TaskService.updateTask(selectedTask.id, {
-          title: values.title,
-          description: values.description,
-          date: parseISO(values.date),
-          duration: values.duration,
-        });
+        const { data: updatedTask } = await TaskService.updateTask(
+          selectedTask.id,
+          {
+            title: values.title,
+            description: values.description,
+            date: parseISO(values.date),
+            duration: values.duration,
+          }
+        );
 
         const parsedTask: CalendarTask = {
           id: updatedTask.id,
-          startAt: updatedTask.date.toISOString(),
+          startAt: parseISO(updatedTask.date).toISOString(),
           endAt: addMinutes(
-            updatedTask.date,
-            convertTimeDurationInMinutes(updatedTask.duration)
+            parseISO(updatedTask.date),
+            updatedTask.duration
           ).toISOString(),
           timezoneStartAt: 'America/Fortaleza',
           timezoneEndAt: 'America/Fortaleza',
@@ -179,9 +185,9 @@ function Home() {
           color: theme.colors.brand,
 
           title: updatedTask.title,
-          date: updatedTask.date,
+          date: parseISO(updatedTask.date),
           description: updatedTask.description,
-          duration: updatedTask.duration,
+          duration: convertMinutesInTimeDuration(updatedTask.duration),
         };
 
         setTasks((prevState) =>
@@ -195,7 +201,7 @@ function Home() {
           status: 'success',
         });
       } else {
-        const newTask = await TaskService.createTask({
+        const { data: newTask } = await TaskService.createTask({
           title: values.title,
           description: values.description,
           date: parseISO(values.date),
@@ -204,10 +210,10 @@ function Home() {
 
         const parsedTask: CalendarTask = {
           id: newTask.id,
-          startAt: newTask.date.toISOString(),
+          startAt: parseISO(newTask.date).toISOString(),
           endAt: addMinutes(
-            newTask.date,
-            convertTimeDurationInMinutes(newTask.duration)
+            parseISO(newTask.date),
+            newTask.duration
           ).toISOString(),
           timezoneStartAt: 'America/Fortaleza',
           timezoneEndAt: 'America/Fortaleza',
@@ -215,9 +221,9 @@ function Home() {
           color: theme.colors.brand,
 
           title: newTask.title,
-          date: newTask.date,
+          date: parseISO(newTask.date),
           description: newTask.description,
-          duration: newTask.duration,
+          duration: convertMinutesInTimeDuration(newTask.duration),
         };
 
         setTasks((prevState) => [...prevState, parsedTask]);
@@ -272,9 +278,9 @@ function Home() {
 
       setIsDeleting(true);
 
-      const deletedTask = await TaskService.deleteTask(selectedTask.id);
+      await TaskService.deleteTask(selectedTask.id);
 
-      setTasks((tasks) => tasks.filter((task) => task.id !== deletedTask.id));
+      setTasks((tasks) => tasks.filter((task) => task.id !== selectedTask.id));
       toast({
         title: 'Tarefa removida com sucesso!',
         status: 'success',
